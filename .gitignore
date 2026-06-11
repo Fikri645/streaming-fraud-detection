@@ -3,7 +3,7 @@ __pycache__/
 .venv/
 reports/*.json
 .cache/
-state/
+state*/
 .env
 logs_*.log
 reports/t3_*.json
