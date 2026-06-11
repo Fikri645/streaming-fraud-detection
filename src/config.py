@@ -20,8 +20,12 @@ TOPIC_FEATURES = "features"
 TOPIC_SCORES = "scores"
 TOPIC_ALERTS = "alerts"
 
-CONSUMER_GROUP_PROCESSOR = "feature-processor"
-CONSUMER_GROUP_SCORER = "fraud-scorer"
+# GROUP_SUFFIX lets the T3 replay test spin up a fresh consumer group +
+# state dir that rebuilds everything from offset 0.
+_SUFFIX = os.environ.get("GROUP_SUFFIX", "")
+CONSUMER_GROUP_PROCESSOR = "feature-processor" + _SUFFIX
+CONSUMER_GROUP_SCORER = "fraud-scorer" + _SUFFIX
+STATE_DIR = Path(__file__).resolve().parents[1] / ("state" + _SUFFIX)
 
 # --------------------------------------------------------------------------- #
 # Redis online feature store

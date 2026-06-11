@@ -6,3 +6,5 @@ reports/*.json
 state/
 .env
 logs_*.log
+reports/t3_*.json
+reports/t4_*.txt
