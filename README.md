@@ -82,12 +82,36 @@ The same `features_core` math is unit-tested for window semantics,
 properties that make a replayable, at-least-once stream behave like a
 database.
 
-## Cloud profile
+## Cloud profile — LIVE
 
-Serving layer (API + dashboard) targets **GCP Cloud Run** (always-free tier)
-with **Upstash Redis** (always-free); the broker has *no* always-free managed
-option in 2026 (Upstash Kafka was discontinued in 2025) — options documented
-in [RESEARCH.md §2](RESEARCH.md). Deploy configs land in `deploy/`.
+**[fraud-api-340979059251.asia-southeast2.run.app](https://fraud-api-340979059251.asia-southeast2.run.app)**
+— FastAPI `/score` + `/health` + `/metrics` + live dashboard on **GCP Cloud
+Run** (Jakarta, always-free tier), reading per-card online features from
+**Upstash Redis** (Singapore, always-free). The local processor streams
+features into the same Upstash instance, so the cloud `/score` serves with
+*real* streaming history:
+
+```
+POST /score {"cc_num":"180046617132290","amt":95,"category":"grocery_pos"}
+  -> score 0.000, safe          (normal txn for this card)
+POST /score {"cc_num":"180046617132290","amt":1500,"category":"shopping_net"}
+  -> score 0.136, ALERT         (same card, anomalous amount)
+```
+
+The broker has *no* always-free managed option in 2026 (Upstash Kafka was
+discontinued in 2025), so the broker + processor + scorer run locally / on a
+trial cluster while Cloud Run hosts the serving surface — documented in
+[deploy/DEPLOY.md](deploy/DEPLOY.md) and [RESEARCH.md §2](RESEARCH.md).
+
+### Two more war stories, from the deploy itself
+
+5. **The blocking prompt** — the first `gcloud run deploy --source` hung
+   forever: it silently waited on a *"create Artifact Registry repo? (Y/n)"*
+   confirmation a detached process can't answer. Fix: `--quiet`.
+6. **The missing OpenMP runtime** — the container built fine but crashed on
+   boot: `python:3.11-slim` ships no `libgomp.so.1`, which **LightGBM**
+   requires (`import lightgbm` → `OSError`). Fix: `apt-get install libgomp1`
+   in the image.
 
 ## License
 

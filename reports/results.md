@@ -50,3 +50,19 @@ offset 0 failed schema validation and crashed the consumer group. Fix: a
 validation guard that skips malformed events and counts them
 (`metrics:poison`) instead of dying. One bad message must never stop the
 stream.
+
+## Cloud deploy (Profile C) — LIVE, Rp 0
+
+**API + dashboard:** GCP Cloud Run (asia-southeast2 / Jakarta, always-free) →
+https://fraud-api-340979059251.asia-southeast2.run.app
+**Online store:** Upstash Redis (ap-southeast-1, always-free, TTL + eviction).
+
+Verified end-to-end: local processor streams per-card features into Upstash;
+the cloud `/score` reads them live — card 180046617132290 scores 0.000 on a
+normal $95 grocery txn and 0.136 (ALERT) on a $1,500 shopping txn, both with
+`degraded_mode:false` (real online features). 286 cards in the online store.
+
+Two deploy war stories: (5) the first `gcloud run deploy --source` hung on an
+un-answerable "create Artifact Registry repo? (Y/n)" prompt → `--quiet`;
+(6) `python:3.11-slim` lacks `libgomp.so.1` so LightGBM crashed at import →
+`apt-get install libgomp1`.
