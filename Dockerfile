@@ -4,6 +4,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# LightGBM needs the OpenMP runtime, which python:3.11-slim does not ship —
+# without libgomp1 the container dies at `import lightgbm`
+# (OSError: libgomp.so.1: cannot open shared object file).
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # lean deps — the API needs neither the broker client nor the stream processor
 RUN pip install --no-cache-dir \
     fastapi "uvicorn[standard]" sse-starlette pydantic "redis>=5.0" \

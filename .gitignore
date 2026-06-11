@@ -8,3 +8,5 @@ state*/
 logs_*.log
 reports/t3_*.json
 reports/t4_*.txt
+deploy_run*.log
+deploy_run*.log.err
