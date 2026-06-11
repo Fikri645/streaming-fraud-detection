@@ -1,0 +1,17 @@
+# Keep the Cloud Build upload small — only ship what the API image needs.
+.venv/
+state/
+state*/
+reports/
+tests/
+deploy/
+logs_*.log
+*.log
+__pycache__/
+*.pyc
+.git/
+.github/
+docker-compose.yml
+RESEARCH.md
+PLAN.md
+README.md
